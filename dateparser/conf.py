@@ -6,7 +6,7 @@ from dateparser.data.languages_info import language_order
 
 from .parser import date_order_chart
 from .utils import registry
-
+from pendulum.tz.timezone import FixedTimezone
 
 @registry
 class Settings:
@@ -18,10 +18,11 @@ class Settings:
     * `TIMEZONE`
     * `TO_TIMEZONE`
     * `RETURN_AS_TIMEZONE_AWARE`
-    * `PREFER_MONTH_OF_YEAR`
     * `PREFER_DAY_OF_MONTH`
     * `PREFER_DATES_FROM`
     * `RELATIVE_BASE`
+    * `ONLY_RELATIVE_LARGER_TIMEFRAME`
+    * `RELATIVE_TIMEZONE`
     * `STRICT_PARSING`
     * `REQUIRE_PARTS`
     * `SKIP_TOKENS`
@@ -30,7 +31,6 @@ class Settings:
     * `PARSERS`
     * `DEFAULT_LANGUAGES`
     * `LANGUAGE_DETECTION_CONFIDENCE_THRESHOLD`
-    * `CACHE_SIZE_LIMIT`
     """
 
     _default = True
@@ -175,22 +175,22 @@ def check_settings(settings):
     Only checks for the modified settings.
     """
     settings_values = {
-        "DATE_ORDER": {
-            "values": tuple(date_order_chart.keys()),
-            "type": str,
+        'DATE_ORDER': {
+            'values': tuple(date_order_chart.keys()),
+            'type': str,
         },
-        "TIMEZONE": {
+        'TIMEZONE': {
             # we don't check invalid Timezones as they raise an error
-            "type": str,
+            'type': str,
         },
-        "TO_TIMEZONE": {
+        'TO_TIMEZONE': {
             # It defaults to None, but it's not allowed to use it directly
             # "values" can take unlimited options
-            "type": str
+            'type': str
         },
-        "RETURN_AS_TIMEZONE_AWARE": {
+        'RETURN_AS_TIMEZONE_AWARE': {
             # It defaults to 'default', but it's not allowed to use it directly
-            "type": bool
+            'type': bool
         },
         "PREFER_MONTH_OF_YEAR": {"values": ("current", "first", "last"), "type": str},
         "PREFER_DAY_OF_MONTH": {"values": ("current", "first", "last"), "type": str},
@@ -198,9 +198,15 @@ def check_settings(settings):
             "values": ("current_period", "past", "future"),
             "type": str,
         },
-        "RELATIVE_BASE": {
+        'RELATIVE_BASE': {
             # "values" can take unlimited options
-            "type": datetime
+            'type': datetime
+        },
+        'ONLY_RELATIVE_LARGER_TIMEFRAME': {
+            'type': bool
+        },
+        'RELATIVE_TIMEZONE': {
+            'type': FixedTimezone
         },
         "STRICT_PARSING": {"type": bool},
         "REQUIRE_PARTS": {
@@ -243,25 +249,25 @@ def check_settings(settings):
         setting_props = settings_values[setting_name]
 
         # check type:
-        if not setting_type == setting_props["type"]:
+        if not setting_type == setting_props['type']:
             raise SettingValidationError(
                 '"{}" must be "{}", not "{}".'.format(
-                    setting_name, setting_props["type"].__name__, setting_type.__name__
+                    setting_name, setting_props['type'].__name__, setting_type.__name__
                 )
             )
 
         # check values:
-        if setting_props.get("values") and setting_value not in setting_props["values"]:
+        if setting_props.get('values') and setting_value not in setting_props['values']:
             raise SettingValidationError(
                 '"{}" is not a valid value for "{}", it should be: "{}" or "{}"'.format(
                     setting_value,
                     setting_name,
-                    '", "'.join(setting_props["values"][:-1]),
-                    setting_props["values"][-1],
+                    '", "'.join(setting_props['values'][:-1]),
+                    setting_props['values'][-1],
                 )
             )
 
         # specific checks
-        extra_check = setting_props.get("extra_check")
+        extra_check = setting_props.get('extra_check')
         if extra_check:
             extra_check(setting_name, setting_value)

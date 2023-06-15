@@ -437,21 +437,52 @@ class _parser:
     def _set_relative_base(self):
         self.now = self.settings.RELATIVE_BASE
         if not self.now:
-            self.now = datetime.utcnow()
+            self.now = pendulum.now(self.settings.RELATIVE_TIMEZONE)
 
     def _get_datetime_obj_params(self):
         if not self.now:
             self._set_relative_base()
 
-        params = {
-            "day": self.day or self.now.day,
-            "month": self.month or self.now.month,
-            "year": self.year or self.now.year,
-            "hour": 0,
-            "minute": 0,
-            "second": 0,
-            "microsecond": 0,
-        }
+        params = {}
+        if self.year:
+            params['year'] = self.year
+            if self.month:
+                params['month'] = self.month
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['month'] = 1
+                else:
+                    params['month'] = self.now.month
+            if self.day:
+                params['day'] = self.day
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['day'] = 1
+                else:
+                    params['day'] = self.now.day
+        elif self.month:
+            params['year'] = self.now.year
+            params['month'] = self.month
+            if self.day:
+                params['day'] = self.day
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['day'] = 1
+                else:
+                    params['day'] = self.now.day
+        elif self.day:
+            params['year'] = self.now.year
+            params['month'] = self.now.month
+            params['day'] = self.day
+        else:
+            params['year'] = self.now.year
+            params['month'] = self.now.month
+            params['day'] = self.now.day
+        
+        params['hour'] = 0
+        params['minute'] = 0
+        params['second'] = 0
+        params['microsecond'] = 0
         return params
 
     def _get_date_obj(self, token, directive):
@@ -480,17 +511,15 @@ class _parser:
         return self._get_datetime_obj(**params)
 
     def _correct_for_time_frame(self, dateobj, tz):
-        days = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+        days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
-        token_weekday, _ = getattr(self, "_token_weekday", (None, None))
+        token_weekday, _ = getattr(self, '_token_weekday', (None, None))
 
-        if token_weekday and not (
-            self._token_year or self._token_month or self._token_day
-        ):
+        if token_weekday and not(self._token_year or self._token_month or self._token_day):
             day_index = calendar.weekday(dateobj.year, dateobj.month, dateobj.day)
             day = token_weekday[:3].lower()
             steps = 0
-            if "future" in self.settings.PREFER_DATES_FROM:
+            if self.settings.PREFER_DATES_FROM == 'future':
                 if days[day_index] == day:
                     steps = 7
                 else:
@@ -498,17 +527,23 @@ class _parser:
                         day_index = (day_index + 1) % 7
                         steps += 1
                 delta = timedelta(days=steps)
-            else:
+            elif self.settings.PREFER_DATES_FROM == 'past':
                 if days[day_index] == day:
-                    if self.settings.PREFER_DATES_FROM == "past":
-                        steps = 7
-                    else:
-                        steps = 0
+                    steps = 7
                 else:
                     while days[day_index] != day:
                         day_index -= 1
                         steps += 1
                 delta = timedelta(days=-steps)
+            else:
+                while days[day_index] != day:
+                    day_index -= 1
+                    steps += 1
+                if day_index < 0:
+                    steps = 7 + day_index
+                    delta = timedelta(days=+steps)
+                else:
+                    delta = timedelta(days=-steps)
 
             dateobj = dateobj + delta
 

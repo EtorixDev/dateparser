@@ -13,11 +13,13 @@ settings = {
     "TIMEZONE": "local",
     "TO_TIMEZONE": False,
     "RETURN_AS_TIMEZONE_AWARE": "default",
+    "RELATIVE_TIMEZONE": "UTC",
     # Incomplete dates
     "PREFER_DAY_OF_MONTH": "current",
     "PREFER_MONTH_OF_YEAR": "current",
     "PREFER_DATES_FROM": "current_period",
     "RELATIVE_BASE": False,
+    "ONLY_RELATIVE_LARGER_TIMEFRAME": False,
     "STRICT_PARSING": False,
     "REQUIRE_PARTS": [],
     # Language detection
