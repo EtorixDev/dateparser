@@ -537,14 +537,8 @@ class _parser:
                         steps += 1
                 delta = timedelta(days=-steps)
             else:
-                while days[day_index] != day:
-                    day_index -= 1
-                    steps += 1
-                if day_index < 0:
-                    steps = 7 + day_index
-                    delta = timedelta(days=+steps)
-                else:
-                    delta = timedelta(days=-steps)
+                steps = days.index(day) - day_index
+                delta = timedelta(days=+steps)
 
             dateobj = dateobj + delta
 
