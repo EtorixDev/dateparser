@@ -513,7 +513,6 @@ class _parser:
 
     def _correct_for_time_frame(self, dateobj, tz):
         days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-
         token_weekday, _ = getattr(self, '_token_weekday', (None, None))
 
         if token_weekday and not(self._token_year or self._token_month or self._token_day):
@@ -525,9 +524,9 @@ class _parser:
                     steps = 7
                 else:
                     while days[day_index] != day:
-                        day_index = (day_index + 1) % 7
+                        day_index += 1
                         steps += 1
-                delta = timedelta(days=steps)
+                delta = timedelta(days=+steps)
             elif self.settings.PREFER_DATES_FROM == 'past':
                 if days[day_index] == day:
                     steps = 7
@@ -537,6 +536,7 @@ class _parser:
                         steps += 1
                 delta = timedelta(days=-steps)
             else:
+                # Want - Current
                 steps = days.index(day) - day_index
                 delta = timedelta(days=+steps)
 
