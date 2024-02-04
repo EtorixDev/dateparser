@@ -1,3 +1,6 @@
+from datetime import timezone
+
+
 default_parsers = [
     "timestamp",
     "relative-time",
@@ -13,7 +16,7 @@ settings = {
     "TIMEZONE": "local",
     "TO_TIMEZONE": False,
     "RETURN_AS_TIMEZONE_AWARE": "default",
-    "RELATIVE_TIMEZONE": "UTC",
+    "RELATIVE_TIMEZONE": timezone.utc,
     # Incomplete dates
     "PREFER_DAY_OF_MONTH": "current",
     "PREFER_MONTH_OF_YEAR": "current",
