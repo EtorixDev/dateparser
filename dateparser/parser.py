@@ -5,7 +5,6 @@ from io import StringIO
 
 import pytz
 import regex as re
-import pendulum
 
 from dateparser.utils import (
     _get_missing_parts,
