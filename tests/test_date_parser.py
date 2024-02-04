@@ -59,6 +59,7 @@ class TestDateParser(BaseTestCase):
             ),
             # French dates
             param("11 Mai 2014", datetime(2014, 5, 11)),
+            param("11 sept. 2014", datetime(2014, 9, 11)),
             param("dimanche, 11 Mai 2014", datetime(2014, 5, 11)),
             param("22 janvier 2015 à 14h40", datetime(2015, 1, 22, 14, 40)),
             param("Dimanche 1er Février à 21:24", datetime(2012, 2, 1, 21, 24)),
@@ -1213,6 +1214,16 @@ class TestDateParser(BaseTestCase):
                 {"PREFER_DATES_FROM": "future"},
             ),
             param(
+                "10pm EDT",
+                datetime(2021, 10, 20, 2, 0),
+                {"PREFER_DATES_FROM": "future"},
+            ),
+            param(
+                "8am AEDT",
+                datetime(2021, 10, 18, 21, 0),
+                {"PREFER_DATES_FROM": "past"},
+            ),
+            param(
                 "11pm AEDT",
                 datetime(2021, 10, 19, 12, 0),
                 {"PREFER_DATES_FROM": "past"},
@@ -1221,6 +1232,16 @@ class TestDateParser(BaseTestCase):
                 "4pm",
                 datetime(2021, 10, 19, 20, 0),
                 {"PREFER_DATES_FROM": "future", "TIMEZONE": "EDT"},
+            ),
+            param(
+                "10pm",
+                datetime(2021, 10, 20, 2, 0),
+                {"PREFER_DATES_FROM": "future", "TIMEZONE": "EDT"},
+            ),
+            param(
+                "8am",
+                datetime(2021, 10, 18, 21, 0),
+                {"PREFER_DATES_FROM": "past", "TIMEZONE": "AEDT"},
             ),
             param(
                 "11pm",
