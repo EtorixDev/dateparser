@@ -1,12 +1,11 @@
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 
 from dateparser.data.languages_info import language_order
 
 from .parser import date_order_chart
 from .utils import registry
-from pendulum.tz.timezone import FixedTimezone
 
 @registry
 class Settings:
@@ -206,7 +205,7 @@ def check_settings(settings):
             'type': bool
         },
         'RELATIVE_TIMEZONE': {
-            'type': FixedTimezone
+            'type': timezone
         },
         "STRICT_PARSING": {"type": bool},
         "REQUIRE_PARTS": {
