@@ -576,9 +576,14 @@ class _parser:
 
         if self.month and not self.year:
             try:
-                if self.now < dateobj:
+                if self.now.month < dateobj.month:
                     if self.settings.PREFER_DATES_FROM == "past":
                         dateobj = dateobj.replace(year=dateobj.year - 1)
+                elif self.now.month == dateobj.month:
+                    if self.settings.PREFER_DATES_FROM == "past":
+                        dateobj = dateobj.replace(year=dateobj.year - 1)
+                    elif self.settings.PREFER_DATES_FROM == "future":
+                        dateobj = dateobj.replace(year=dateobj.year + 1)
                 else:
                     if self.settings.PREFER_DATES_FROM == "future":
                         dateobj = dateobj.replace(year=dateobj.year + 1)
