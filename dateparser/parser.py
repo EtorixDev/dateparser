@@ -437,21 +437,52 @@ class _parser:
     def _set_relative_base(self):
         self.now = self.settings.RELATIVE_BASE
         if not self.now:
-            self.now = datetime.now(tz=timezone.utc).replace(tzinfo=None)
+            self.now = datetime.now(self.settings.RELATIVE_TIMEZONE).replace(tzinfo=None)
 
     def _get_datetime_obj_params(self):
         if not self.now:
             self._set_relative_base()
 
-        params = {
-            "day": self.day or self.now.day,
-            "month": self.month or self.now.month,
-            "year": self.year or self.now.year,
-            "hour": 0,
-            "minute": 0,
-            "second": 0,
-            "microsecond": 0,
-        }
+        params = {}
+        if self.year:
+            params['year'] = self.year
+            if self.month:
+                params['month'] = self.month
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['month'] = 1
+                else:
+                    params['month'] = self.now.month
+            if self.day:
+                params['day'] = self.day
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['day'] = 1
+                else:
+                    params['day'] = self.now.day
+        elif self.month:
+            params['year'] = self.now.year
+            params['month'] = self.month
+            if self.day:
+                params['day'] = self.day
+            else:
+                if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+                    params['day'] = 1
+                else:
+                    params['day'] = self.now.day
+        elif self.day:
+            params['year'] = self.now.year
+            params['month'] = self.now.month
+            params['day'] = self.day
+        else:
+            params['year'] = self.now.year
+            params['month'] = self.now.month
+            params['day'] = self.now.day
+        
+        params['hour'] = 0
+        params['minute'] = 0
+        params['second'] = 0
+        params['microsecond'] = 0
         return params
 
     def _get_date_obj(self, token, directive):
