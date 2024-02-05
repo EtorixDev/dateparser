@@ -22,6 +22,8 @@ settings = {
     "PREFER_MONTH_OF_YEAR": "current",
     "PREFER_DATES_FROM": "current_period",
     "RELATIVE_BASE": False,
+    # Treats "current" of PREFER_DAY_OF_MONTH 
+    # & PREFER_MONTH_OF_YEAR as "first"
     "ONLY_RELATIVE_LARGER_TIMEFRAME": False,
     "STRICT_PARSING": False,
     "REQUIRE_PARTS": [],
