@@ -450,14 +450,25 @@ class _parser:
                 params['month'] = self.month
             else:
                 if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
-                    params['month'] = 1
+                    if self.settings.PREFER_MONTH_OF_YEAR == "last":
+                        params['month'] = 12
+                        setattr(self, "_token_month", ('december', 1))
+                    else:
+                        params['month'] = 1
+                        setattr(self, "_token_month", ('january', 1))
                 else:
                     params['month'] = self.now.month
             if self.day:
                 params['day'] = self.day
             else:
                 if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
-                    params['day'] = 1
+                    if self.settings.PREFER_DAY_OF_MONTH == "last":
+                        day = get_last_day_of_month(params['year'], params['month'])
+                        params['day'] = day
+                        setattr(self, "_token_day", (str(day), 0))
+                    else:
+                        params['day'] = 1
+                        setattr(self, "_token_day", ('1', 0))
                 else:
                     params['day'] = self.now.day
         elif self.month:
@@ -467,7 +478,13 @@ class _parser:
                 params['day'] = self.day
             else:
                 if self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
-                    params['day'] = 1
+                    if self.settings.PREFER_DAY_OF_MONTH == "last":
+                        day = get_last_day_of_month(params['year'], params['month'])
+                        params['day'] = day
+                        setattr(self, "_token_day", (str(day), 0))
+                    else:
+                        params['day'] = 1
+                        setattr(self, "_token_day", ('1', 0))
                 else:
                     params['day'] = self.now.day
         elif self.day:
