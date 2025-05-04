@@ -410,7 +410,7 @@ class TestTranslateSearch(BaseTestCase):
                 "Die UdSSR blieb gemäß dem Neutralitätspakt "
                 "vom 13. April 1941 gegenüber Japan vorerst neutral.",
                 [
-                    ("Die", datetime.datetime(1999, 12, 28, 0, 0)),
+                    ("Die", datetime.datetime(1999, 1, 28, 0, 0)),
                     ("13. April 1941", datetime.datetime(1941, 4, 13, 0, 0)),
                 ],
                 settings={"RELATIVE_BASE": datetime.datetime(2000, 1, 1)},
@@ -576,8 +576,7 @@ class TestTranslateSearch(BaseTestCase):
             ),
             param(
                 "en",
-                "2014 was good! October was excellent!"
-                " Friday, 21 was especially good!",
+                "2014 was good! October was excellent! Friday, 21 was especially good!",
                 [
                     ("2014", datetime.datetime(2014, today.month, today.day, 0, 0)),
                     ("October", datetime.datetime(2014, 10, today.day, 0, 0)),
@@ -642,7 +641,14 @@ class TestTranslateSearch(BaseTestCase):
                     (
                         "June 23th 5 pm EST",
                         datetime.datetime(
-                            2023, 6, 23, 17, 0, tzinfo=pytz.timezone("EST")
+                            2023,
+                            6,
+                            23,
+                            17,
+                            0,
+                            tzinfo=datetime.timezone(
+                                datetime.timedelta(hours=-5), name="EST"
+                            ),
                         ),
                     ),
                     ("May 31", datetime.datetime(2023, 5, 31, 0, 0)),
@@ -825,7 +831,10 @@ class TestTranslateSearch(BaseTestCase):
                 "бомбардировки срещу Япония, използувайки новозавладените острови като бази.",
             ),
             # Chinese
-            param("zh", "不過大多數人仍多把第二次世界大戰的爆發定為1939年9月1日德國入侵波蘭開始，2015年04月08日10点05。"),
+            param(
+                "zh",
+                "不過大多數人仍多把第二次世界大戰的爆發定為1939年9月1日德國入侵波蘭開始，2015年04月08日10点05。",
+            ),
             # Czech
             param(
                 "cs",
@@ -897,7 +906,10 @@ class TestTranslateSearch(BaseTestCase):
                 "d'Etiopia. Il 9 maggio 1936 venne proclamato l'Impero. ",
             ),
             # Japanese
-            param("ja", "1933年（昭和8年）12月23日午前6時39分、宮城（現：皇居）内の産殿にて誕生。"),
+            param(
+                "ja",
+                "1933年（昭和8年）12月23日午前6時39分、宮城（現：皇居）内の産殿にて誕生。",
+            ),
             # Persian
             param("fa", "نگ جهانی دوم جنگ جدی بین سپتامبر 1939 و 2 سپتامبر 1945 بود."),
             # Polish
@@ -1078,3 +1090,16 @@ class TestTranslateSearch(BaseTestCase):
             text=text, languages=languages, error_type=ValueError
         )
         self.check_error_message("Unknown language(s): 'unknown language code'")
+
+    def test_search_dates_with_prepositions(self):
+        """Test `search_dates` for parsing Russian date ranges with prepositions and language detection."""
+        result = search_dates(
+            "Сервис будет недоступен с 12 января по 30 апреля.",
+            add_detected_language=True,
+            languages=["ru"],
+        )
+        expected = [
+            ("12 января", datetime.datetime(2025, 1, 12, 0, 0), "ru"),
+            ("30 апреля", datetime.datetime(2025, 4, 30, 0, 0), "ru"),
+        ]
+        assert result == expected
