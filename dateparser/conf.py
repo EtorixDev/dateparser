@@ -17,6 +17,7 @@ class Settings:
     * `TIMEZONE`
     * `TO_TIMEZONE`
     * `RETURN_AS_TIMEZONE_AWARE`
+    * `PREFER_MONTH_OF_YEAR`
     * `PREFER_DAY_OF_MONTH`
     * `PREFER_DATES_FROM`
     * `RELATIVE_BASE`
@@ -30,6 +31,7 @@ class Settings:
     * `PARSERS`
     * `DEFAULT_LANGUAGES`
     * `LANGUAGE_DETECTION_CONFIDENCE_THRESHOLD`
+    * `CACHE_SIZE_LIMIT`
     """
 
     _default = True
