@@ -1,10 +1,29 @@
-skip: ["about", "ad", "and", "at", "by", "just", "m", "nd", "of", "on", "rd", "st", "th", "the"]
+skip: ["about", "ad", "and", "at", "by", "from", "just", "m", "nd", "of", "on", "rd", "st", "th", "the"]
 pertain: ["of"]
 
 sentence_splitter_group : 1
 
+monday:
+    - mo
+
 tuesday:
+    - tu
     - Tues
+
+wednesday:
+    - we
+
+thursday:
+    - th
+
+friday:
+    - fr
+
+saturday:
+    - sa
+
+sunday:
+    - su
 
 september:
     - sept
