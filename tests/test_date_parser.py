@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from unittest.mock import Mock, patch
 
@@ -1362,6 +1362,75 @@ class TestDateParser(BaseTestCase):
             patch("dateparser.utils.datetime", UtilsDateTime),
         ):
             self.assertEqual(parse("2014"), datetime(2014, 5, 31))
+
+    @parameterized.expand(
+        [
+            param(
+                date_string="2015",
+                settings={},
+                expected=datetime(2015, 1, 1),
+            ),
+            param(
+                date_string="2020",
+                settings={"PREFER_DAY_OF_MONTH": "last"},
+                expected=datetime(2020, 1, 31),
+            ),
+            param(
+                date_string="2020",
+                settings={
+                    "PREFER_MONTH_OF_YEAR": "last",
+                    "PREFER_DAY_OF_MONTH": "last",
+                },
+                expected=datetime(2020, 12, 31),
+            ),
+            param(
+                date_string="March",
+                settings={},
+                expected=datetime(2010, 3, 1),
+            ),
+            param(
+                date_string="February",
+                settings={"PREFER_DAY_OF_MONTH": "last"},
+                expected=datetime(2010, 2, 28),
+            ),
+        ]
+    )
+    def test_only_relative_larger_timeframe_uses_preference_boundaries(
+        self, date_string, settings, expected
+    ):
+        self.given_parser(
+            settings={
+                "RELATIVE_BASE": datetime(2010, 2, 10),
+                "ONLY_RELATIVE_LARGER_TIMEFRAME": True,
+                **settings,
+            }
+        )
+        self.when_date_is_parsed(date_string)
+        self.then_date_was_parsed_by_date_parser()
+        self.then_date_obj_exactly_is(expected)
+
+    def test_relative_timezone_controls_default_relative_base(self):
+        class ParserDateTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                base = datetime(2026, 5, 31, 23, 30, tzinfo=timezone.utc)
+                return base.astimezone(tz) if tz else base.replace(tzinfo=None)
+
+        with patch("dateparser.parser.datetime", ParserDateTime):
+            self.assertEqual(
+                parse(
+                    "2014",
+                    settings={"RELATIVE_TIMEZONE": timezone(timedelta(hours=2))},
+                ),
+                datetime(2014, 6, 1),
+            )
+            self.assertEqual(
+                parse(
+                    "2014",
+                    settings={"RELATIVE_TIMEZONE": timezone(timedelta(hours=-2))},
+                ),
+                datetime(2014, 5, 31),
+            )
 
     @parameterized.expand(
         [

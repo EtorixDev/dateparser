@@ -1,5 +1,5 @@
 import hashlib
-from datetime import datetime
+from datetime import datetime, tzinfo
 from functools import wraps
 
 from dateparser.data.languages_info import language_order
@@ -22,6 +22,8 @@ class Settings:
     * `PREFER_DAY_OF_MONTH`
     * `PREFER_DATES_FROM`
     * `RELATIVE_BASE`
+    * `RELATIVE_TIMEZONE`
+    * `ONLY_RELATIVE_LARGER_TIMEFRAME`
     * `STRICT_PARSING`
     * `REQUIRE_PARTS`
     * `SKIP_TOKENS`
@@ -208,6 +210,11 @@ def check_settings(settings):
             # "values" can take unlimited options
             "type": datetime
         },
+        "RELATIVE_TIMEZONE": {
+            # "values" can take unlimited options
+            "type": tzinfo,
+        },
+        "ONLY_RELATIVE_LARGER_TIMEFRAME": {"type": bool},
         "STRICT_PARSING": {"type": bool},
         "REQUIRE_PARTS": {
             # "values" covered by the 'extra_check'

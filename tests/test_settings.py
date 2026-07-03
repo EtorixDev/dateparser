@@ -1,4 +1,4 @@
-from datetime import datetime, tzinfo
+from datetime import datetime, timezone, tzinfo
 
 import pytest
 from parameterized import param, parameterized
@@ -194,6 +194,8 @@ class InvalidSettingsTest(BaseTestCase):
             param("PREFER_DAY_OF_MONTH", False, "current_period", "current"),
             param("PREFER_DATES_FROM", True, "current", "current_period"),
             param("RELATIVE_BASE", "yesterday", "", datetime.now()),
+            param("RELATIVE_TIMEZONE", "UTC", "", timezone.utc),
+            param("ONLY_RELATIVE_LARGER_TIMEFRAME", "true", "", True),
             param("SKIP_TOKENS", "foo", "", ["foo"]),
             param("REQUIRE_PARTS", "day", "", ["month", "day"]),
             param("PARSERS", "absolute-time", "", ["absolute-time", "no-spaces-time"]),

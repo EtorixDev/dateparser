@@ -112,6 +112,12 @@ For example, assuming current date is `June 16, 2015`:
     >>> parse('tomorrow', settings={'RELATIVE_BASE': datetime.datetime(2020, 1, 1)})
     datetime.datetime(2020, 1, 2, 0, 0)
 
+``RELATIVE_TIMEZONE``: sets the timezone used to calculate the current datetime when ``RELATIVE_BASE`` is not set.
+It defaults to UTC.
+
+``ONLY_RELATIVE_LARGER_TIMEFRAME``: when ``True``, incomplete absolute dates fill only the larger missing timeframe from preference boundaries.
+For example, parsing a year with no month or day uses January 1 by default instead of the current month and day.
+
 ``RETURN_TIME_SPAN``
 ~~~~~~~~~~~~~~~~~~~~
 

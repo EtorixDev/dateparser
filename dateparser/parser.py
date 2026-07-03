@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from io import StringIO
 
 import pytz
@@ -434,16 +434,53 @@ class _parser:
     def _set_relative_base(self):
         self.now = self.settings.RELATIVE_BASE
         if not self.now:
-            self.now = datetime.now(tz=timezone.utc).replace(tzinfo=None)
+            self.now = datetime.now(tz=self.settings.RELATIVE_TIMEZONE).replace(
+                tzinfo=None
+            )
+
+    def _get_larger_timeframe_month(self):
+        if self.settings.PREFER_MONTH_OF_YEAR == "last":
+            self._token_month = ("december", 1)
+            return 12
+
+        self._token_month = ("january", 1)
+        return 1
+
+    def _get_larger_timeframe_day(self, year, month):
+        if self.settings.PREFER_DAY_OF_MONTH == "last":
+            day = get_last_day_of_month(year, month)
+        else:
+            day = 1
+
+        self._token_day = (str(day), 0)
+        return day
 
     def _get_datetime_obj_params(self):
         if not self.now:
             self._set_relative_base()
 
+        year = self.year or self.now.year
+
+        if self.month:
+            month = self.month
+        elif self.year and self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME:
+            month = self._get_larger_timeframe_month()
+        else:
+            month = self.now.month
+
+        if self.day:
+            day = self.day
+        elif self.settings.ONLY_RELATIVE_LARGER_TIMEFRAME and (
+            self.year or self.month
+        ):
+            day = self._get_larger_timeframe_day(year, month)
+        else:
+            day = self.now.day
+
         params = {
-            "day": self.day or self.now.day,
-            "month": self.month or self.now.month,
-            "year": self.year or self.now.year,
+            "day": day,
+            "month": month,
+            "year": year,
             "hour": 0,
             "minute": 0,
             "second": 0,
