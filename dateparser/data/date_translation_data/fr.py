@@ -116,6 +116,7 @@ info = {
     "hour": [
         "h",
         "heure",
+        "heures",
         "heures"
     ],
     "minute": [
@@ -472,6 +473,12 @@ info = {
             "(\\d++[.,]?\\d*+)h(\\d++[.,]?\\d*+)m?": "\\1:\\2"
         },
         {
+            "(?<!\\by )(?<!\\by a )\\bà ([01]?\\d|2[0-3])h\\b": "à \\1:00"
+        },
+        {
+            "(?<!\\by a )\\b((?:19|20)\\d\\d,? |\\d{4}-\\d{2}-\\d{2} )([01]?\\d|2[0-3])h\\b": "\\1\\2:00"
+        },
+        {
             "moins\\s(?:de\\s)?(\\d++[.,]?\\d*+)\\s?(minute|seconde|heure)": "\\1 \\2"
         },
         {
@@ -499,7 +506,7 @@ info = {
             "six": "6"
         },
         {
-            "sept": "7"
+            "sept(?=:\\d|\\s*(?:années|année|ans|an|semaines|semaine|sem|secondes|seconde|minutes|minute|min|mois|heures|heure|jours|jour|[jhms])\\b|\\s*a\\b(?!\\s*\\d))": "7"
         },
         {
             "huit": "8"
@@ -515,6 +522,9 @@ info = {
         },
         {
             "douze": "12"
+        },
+        {
+            "(?<!(?:apr[eè]s|avant)(?:[\\W_]+le)?[\\W_]+)midi": "12:00"
         }
     ]
 }
