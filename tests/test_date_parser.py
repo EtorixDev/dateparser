@@ -1496,8 +1496,8 @@ class TestDateParser(BaseTestCase):
     def test_only_relative_larger_timeframe_preserves_reference_timezone(self) -> None:
         class FrozenDatetime(datetime):
             @classmethod
-            def now(cls, tz: tzinfo | None = None) -> datetime:
-                reference = datetime(2026, 1, 1, 0, 30, tzinfo=timezone.utc)
+            def now(cls, tz: tzinfo | None = None) -> "FrozenDatetime":
+                reference = cls(2026, 1, 1, 0, 30, tzinfo=timezone.utc)
                 return (
                     reference.astimezone(tz) if tz else reference.replace(tzinfo=None)
                 )
